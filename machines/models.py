@@ -7,6 +7,18 @@ DB_DATETIME_Z_FORMAT = '%m/%d/%Y 0:0'
 DB_TIME_FORMAT = "%H:%M"
 
 
+class Developer(models.Model):
+    class Meta:
+        verbose_name = "Служба"
+        verbose_name_plural = "Службы"
+
+    name = models.CharField(max_length=120)
+    comment = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Category(models.Model):
     class Meta:
         verbose_name = "Тип"
@@ -18,17 +30,48 @@ class Category(models.Model):
         return self.name
 
 
+class Manufacturing(models.Model):
+    class Meta:
+        verbose_name = "Цех"
+        verbose_name_plural = "Цеха"
+
+    name = models.CharField(max_length=120, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProductionArea(models.Model):
+    class Meta:
+        verbose_name = "Участок"
+        verbose_name_plural = "Участки"
+
+    name = models.CharField(max_length=120, blank=True)
+    manufacturing = models.ForeignKey('Manufacturing', related_name='manufacturing', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{}/{}'.format(self.manufacturing.name, self.name)
+
+
 class Machine(models.Model):
     class Meta:
         verbose_name = "Оборудование"
         verbose_name_plural = "Оборудования"
 
-    name = models.TextField(blank=True)
-    comment = models.TextField(blank=True)
+    name = models.CharField(max_length=120, blank=True)
+    comment = models.CharField(max_length=120, blank=True)
     category = models.ForeignKey('Category', related_name='machines', on_delete=models.CASCADE)
+    production_area = models.ForeignKey('ProductionArea', related_name='production_area', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
+    def create_manufacturing(self):
+        manufacturing = self.production_area.manufacturing.name
+        return manufacturing
+
+    def create_area(self):
+        return self.production_area.name
 
 
 class Value(models.Model):

@@ -3,9 +3,28 @@ from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import Machine, Value
+from .models import Manufacturing, ProductionArea, Machine, Value
 
 
+class ManufacturingType(DjangoObjectType):
+    class Meta:
+        model = Manufacturing
+        filter_fields = {
+            'name': ['exact', 'icontains', 'istartswith']
+        }
+        interfaces = (relay.Node,)
+
+
+class ProductionAreaType(DjangoObjectType):
+    class Meta:
+        model = ProductionArea
+        filter_fields = {
+            'name': ['exact', 'icontains', 'istartswith']
+        }
+        interfaces = (relay.Node,)
+
+
+# todo: добавить поле выбора избранного оборудования
 class MachineType(DjangoObjectType):
     class Meta:
         model = Machine
@@ -16,6 +35,21 @@ class MachineType(DjangoObjectType):
         }
         interfaces = (relay.Node,)
 
+    location = graphene.String()
+    area = graphene.String()
+
+    def create_manufacturing(self):
+        return self.create_manufacturing()
+
+    def create_area(self):
+        return self.create_area()
+
+    def resolve_location(self, info):
+        return self.create_manufacturing()
+
+    def resolve_area(self, info):
+        return self.create_area()
+
 
 class ValueType(DjangoObjectType):
     class Meta:
@@ -25,17 +59,32 @@ class ValueType(DjangoObjectType):
 
     speed = graphene.Int()
     kmv = graphene.Float()
+    status = graphene.String()
 
-    # todo: как то не правильно организован вызов... нет подсветки на self.create_speed()
+    def create_speed(self):
+        return self.create_speed()
+
+    def create_kmv(self):
+        return self.create_kmv()
+
     def resolve_speed(self, info):
         return self.create_speed()
 
-    # todo: как то не правильно организован вызов... нет подсветки на self.create_kmv()
     def resolve_kmv(self, info):
         return self.create_kmv()
 
+    # green: 'success',
+    # blue: 'info',
+    # red: 'danger'
+    def resolve_status(self, info):
+        return "red"
+
 
 class Query(graphene.ObjectType):
+    manufacturing = relay.Node.Field(ManufacturingType)
+    manufacturings = DjangoFilterConnectionField(ManufacturingType)
+    production_area = relay.Node.Field(ProductionAreaType)
+    production_areas = DjangoFilterConnectionField(ProductionAreaType)
     machine = relay.Node.Field(MachineType)
     machines = DjangoFilterConnectionField(MachineType)
     value = relay.Node.Field(ValueType)
