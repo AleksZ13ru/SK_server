@@ -31,18 +31,25 @@ class MachineType(DjangoObjectType):
         filter_fields = {
             'name': ['exact', 'icontains', 'istartswith'],
             'comment': ['exact', 'icontains', 'istartswith'],
-            # 'value__day': ['exect'],
+            'values__day': ['exact'],
         }
         interfaces = (relay.Node,)
 
+    category = graphene.String()
     location = graphene.String()
     area = graphene.String()
+
+    def create_category(self):
+        return self.create_category()
 
     def create_manufacturing(self):
         return self.create_manufacturing()
 
     def create_area(self):
         return self.create_area()
+
+    def resolve_category(self, info):
+        return self.create_category()
 
     def resolve_location(self, info):
         return self.create_manufacturing()

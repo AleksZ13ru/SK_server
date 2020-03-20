@@ -66,6 +66,9 @@ class Machine(models.Model):
     def __str__(self):
         return self.name
 
+    def create_category(self):
+        return self.category.name
+
     def create_manufacturing(self):
         manufacturing = self.production_area.manufacturing.name
         return manufacturing
