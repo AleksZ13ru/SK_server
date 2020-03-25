@@ -3,7 +3,12 @@ from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import Manufacturing, ProductionArea, Machine, Value
+from .models import Manufacturing, ProductionArea, Machine, Value, Developer
+
+
+class DeveloperType(DjangoObjectType):
+    class Meta:
+        model = Developer
 
 
 class ManufacturingType(DjangoObjectType):
